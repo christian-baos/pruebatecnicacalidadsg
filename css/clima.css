@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,700,900&display=swap');
 
 :root {
-  --gradient: linear-gradient(135deg, #4acbcf 20%, #d8d5d5 80%);
+  --gradient: linear-gradient(135deg, #52c1c5 20%, #faa186 80%);
 }
 
 * {
@@ -20,8 +20,10 @@ body {
   font-family: 'Montserrat', sans-serif;
   background: var(--gradient);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding: 20px;
 }
 
 .container {
@@ -29,7 +31,7 @@ body {
   box-shadow: 0 0 70px -10px rgba(0, 0, 0, 0.2);
   background-color: #222831;
   color: #ffffff;
-  height: 400px;
+  height: 600px;
 }
 
 .weather-side {
@@ -212,3 +214,93 @@ body {
 .location-input:hover {
   transform: scale(0.95);
 }
+
+.container {
+  margin-bottom: 40px;
+}
+
+.button-container {
+  display: flex; 
+  justify-content: center; 
+  margin: 20px 0; 
+}
+
+#consultarBtn {
+  background-color: #2e85be;
+  border: none; 
+  color: white; 
+  padding: 15px 32px; 
+  text-align: center; 
+  text-decoration: none; 
+  display: inline-block; 
+  font-size: 16px; 
+  margin: 4px 2px; 
+  cursor: pointer; 
+  border-radius: 12px; 
+  transition: background-color 0.3s ease; 
+}
+
+#consultarBtn:hover {
+  background-color: #2e85be;
+}
+
+#consultarBtn:active {
+  background-color: #2e85be; 
+  transform: translateY(2px);
+}
+
+
+table#miTabla {
+  margin-top: 40px; /* Espacio entre el clima y la tabla */
+}
+
+/* Estilos para el modo oscuro en DataTables */
+table.dataTable {
+  background-color: #222831; /* Fondo de la tabla */
+  color: #000000; /* Color del texto */
+}
+
+table.dataTable thead {
+  background-color: #393e46; /* Fondo del encabezado */
+  color: #ffffff; /* Color del texto del encabezado */
+}
+
+table.dataTable tbody tr {
+  background-color: #393e46; /* Color de fondo de las filas */
+}
+
+table.dataTable tbody tr:nth-child(odd) {
+  background-color: #2a2d30; /* Color de fondo para filas impares */
+}
+
+table.dataTable tbody tr:hover {
+  background-color: #5a6268; /* Color de fondo al pasar el ratón */
+}
+
+table.dataTable th, table.dataTable td {
+  border: 1px solid #444; /* Bordes de las celdas */
+}
+
+.dataTables_wrapper .dataTables_filter input {
+  background-color: #4e5458; /* Fondo de la barra de búsqueda */
+  color: #ffffff; /* Texto blanco en la barra de búsqueda */
+  border: 1px solid #444; /* Borde oscuro en la barra de búsqueda */
+}
+
+.dataTables_wrapper .dataTables_filter label {
+  color: #ffffff; /* Color del texto de la etiqueta de la barra de búsqueda */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: #4e5458; /* Fondo de los botones de paginación */
+  color: #ffffff; /* Texto blanco en los botones de paginación */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #5a6268; /* Fondo al pasar el ratón sobre los botones de paginación */
+}
+
+
+
+
+

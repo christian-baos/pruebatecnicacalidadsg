@@ -1,87 +1,108 @@
+/*
 document.getElementById('city').addEventListener('input', function () {
     var city = this.value;
     getWeather(city);
   });
-  
-  async function getWeather() {
+*/
+
+function consultarClima() {
+    const cityInput = document.getElementById('city'); 
+    const city = cityInput.value || 'Santiago de Cali'; 
+    getWeather(city);
+}
+
+async function getWeather(city) {
     try {
-        var city = document.getElementById('city').value;
-        console.log('Şəhər adı:', city);
-  
+        console.log('Nombre de ciudad:', city);
+
         const response = await axios.get('https://api.openweathermap.org/data/2.5/forecast', {
             params: {
                 q: city,
                 appid: '54a57bc234ad752a4f59e59cd372201d',
-                units: 'metric'
+                units: 'metric',
+                lang: 'es' // Cambia a minúsculas para asegurar consistencia
             },
         });
+
         const currentTemperature = response.data.list[0].main.temp;
-  
-        document.querySelector('.weather-temp').textContent = Math.round(currentTemperature) + 'ºC';
-  
-        const forecastData = response.data.list;
-  
-        const dailyForecast = {};
-        forecastData.forEach((data) => {
-            const day = new Date(data.dt * 1000).toLocaleDateString('en-US', { weekday: 'long' });
-            if (!dailyForecast[day]) {
-                dailyForecast[day] = {
-                    minTemp: data.main.temp_min,
-                    maxTemp: data.main.temp_max,
-                    description: data.weather[0].description,
-                    humidity: data.main.humidity,
-                    windSpeed: data.wind.speed,
-                    icon: data.weather[0].icon,
-  
-  
-                };
-            } else {
-                dailyForecast[day].minTemp = Math.min(dailyForecast[day].minTemp, data.main.temp_min);
-                dailyForecast[day].maxTemp = Math.max(dailyForecast[day].maxTemp, data.main.temp_max);
-            }
-        });
-  
-        document.querySelector('.date-dayname').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-  
-        const date = new Date().toUTCString();
-        const extractedDateTime = date.slice(5, 16);
-        document.querySelector('.date-day').textContent = extractedDateTime.toLocaleString('en-US');
-  
-        const currentWeatherIconCode = dailyForecast[new Date().toLocaleDateString('en-US', { weekday: 'long' })].icon;
-        const weatherIconElement = document.querySelector('.weather-icon');
-        weatherIconElement.innerHTML = getWeatherIcon(currentWeatherIconCode);
-  
-        document.querySelector('.location').textContent = response.data.city.name;
-        document.querySelector('.weather-desc').textContent = dailyForecast[new Date().toLocaleDateString('en-US', { weekday: 'long' })].description.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  
-        document.querySelector('.humidity .value').textContent = dailyForecast[new Date().toLocaleDateString('en-US', { weekday: 'long' })].humidity + ' %';
-        document.querySelector('.wind .value').textContent = dailyForecast[new Date().toLocaleDateString('en-US', { weekday: 'long' })].windSpeed + ' m/s';
-  
-  
-        const dayElements = document.querySelectorAll('.day-name');
-        const tempElements = document.querySelectorAll('.day-temp');
-        const iconElements = document.querySelectorAll('.day-icon');
-  
-        dayElements.forEach((dayElement, index) => {
-            const day = Object.keys(dailyForecast)[index];
-            const data = dailyForecast[day];
-            dayElement.textContent = day;
-            tempElements[index].textContent = `${Math.round(data.minTemp)}º / ${Math.round(data.maxTemp)}º`;
-            iconElements[index].innerHTML = getWeatherIcon(data.icon);
-        });
-  
+        updateWeatherUI(response.data, currentTemperature);
     } catch (error) {
-        console.error('Məlumat alınarkən səhv baş verdi:', error.message);
+        handleError(error);
     }
-  }
-  
-  function getWeatherIcon(iconCode) {
-    const iconBaseUrl = 'https://openweathermap.org/img/wn/';
-    const iconSize = '@2x.png';
-    return `<img src="${iconBaseUrl}${iconCode}${iconSize}" alt="Weather Icon">`;
-  }
-  
-  document.addEventListener("DOMContentLoaded", function () {
-    getWeather();
-    setInterval(getWeather, 900000);
-  });
+}
+
+function updateWeatherUI(data, currentTemperature) {
+    const dailyForecast = {};
+    data.list.forEach((item) => {
+        const day = new Date(item.dt * 1000).toLocaleDateString('es-US', { weekday: 'long' });
+        if (!dailyForecast[day]) {
+            dailyForecast[day] = {
+                minTemp: item.main.temp_min,
+                maxTemp: item.main.temp_max,
+                description: item.weather[0].description,
+                humidity: item.main.humidity,
+                windSpeed: item.wind.speed,
+                icon: item.weather[0].icon,
+            };
+        } else {
+            dailyForecast[day].minTemp = Math.min(dailyForecast[day].minTemp, item.main.temp_min);
+            dailyForecast[day].maxTemp = Math.max(dailyForecast[day].maxTemp, item.main.temp_max);
+        }
+    });
+
+    const today = new Date().toLocaleDateString('es-US', { weekday: 'long' });
+    document.querySelector('.weather-temp').textContent = Math.round(currentTemperature) + 'ºC';
+    document.querySelector('.date-dayname').textContent = today;
+    
+    const extractedDateTime = new Date().toLocaleString('es-US', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.querySelector('.date-day').textContent = extractedDateTime;
+
+    const currentWeather = dailyForecast[today];
+    document.querySelector('.weather-icon').innerHTML = getWeatherIcon(currentWeather.icon);
+    document.querySelector('.location').textContent = data.city.name;
+    document.querySelector('.weather-desc').textContent = capitalizeWords(currentWeather.description);
+    document.querySelector('.humidity .value').textContent = `${currentWeather.humidity} %`;
+    document.querySelector('.wind .value').textContent = `${currentWeather.windSpeed} m/s`;
+
+    const dayElements = document.querySelectorAll('.day-name');
+    const tempElements = document.querySelectorAll('.day-temp');
+    const iconElements = document.querySelectorAll('.day-icon');
+
+    dayElements.forEach((dayElement, index) => {
+        const day = Object.keys(dailyForecast)[index];
+        const weatherData = dailyForecast[day];
+        dayElement.textContent = day;
+        tempElements[index].textContent = `${Math.round(weatherData.minTemp)}º / ${Math.round(weatherData.maxTemp)}º`;
+        iconElements[index].innerHTML = getWeatherIcon(weatherData.icon);
+    });
+}
+
+function getWeatherIcon(iconCode) {
+    return `<img src="https://openweathermap.org/img/wn/${iconCode}@2x.png" alt="Weather Icon">`;
+}
+
+function displayError(message) {
+    const errorMessage = document.querySelector('.error-message');
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'block';
+}
+
+function handleError(error) {
+    const errorMessage = error.response ? error.response.data.message : 'No se ha podido conectar correctamente';
+    displayError(`Error: ${errorMessage}`);
+}
+
+function capitalizeWords(string) {
+    return string.split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const defaultCity = document.getElementById('city').value || 'Cali';
+    consultarClima(defaultCity);
+    setInterval(() => consultarClima(defaultCity), 900000);
+});
+
+
+
